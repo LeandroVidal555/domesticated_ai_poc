@@ -1,0 +1,33 @@
+global:
+  account: '026090519011'
+  region: 'us-east-1'
+  common_prefix: 'dom-ai-poc'
+  env: 'poc'
+  tags:
+    owner: 'EPWERY'
+    project: 'Domesticated AI PoC'
+    env: 'poc'
+    contact: 'lmv.vidal@gmail.com'
+
+networking:
+  vpc_cidr: '172.32.0.0/16'
+  az_count: 3
+  public_subnet_name: 'PublicSubnet'
+  public_subnet_prefix: 20
+  private_subnet_name: 'PrivateSubnet'
+  private_subnet_prefix: 20
+  isolated_subnet_name: 'IsolatedSubnet'
+  isolated_subnet_prefix: 20
+
+security:
+  pgres_port: 5432
+  cf_prefix_list: 'pl-4ea04527'
+
+compute:
+  # no values yet
+
+database:
+  # no values yet
+
+access:
+  pgres_port: 5432

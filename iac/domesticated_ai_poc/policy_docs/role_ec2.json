@@ -1,0 +1,13 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Description": "DUmmy for synth",
+            "Effect": "Allow",
+            "Action": "test:1",
+            "Resource": [
+                "dummy"
+            ]
+        }
+    ]
+}

@@ -1,1 +1,3 @@
-# domesticated_ai_poc
+# Infrastructure as Code (CDK Python) repo
+
+Contact: Leandro Vidal (lmv.vidal@gmail.com)
