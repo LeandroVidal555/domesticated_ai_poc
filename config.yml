@@ -1,7 +1,7 @@
 global:
   account: '026090519011'
   region: 'us-east-1'
-  common_prefix: 'dom-ai-poc'
+  common_prefix: 'dom-ai'
   env: 'poc'
   tags:
     owner: 'EPWERY'
@@ -27,6 +27,9 @@ compute:
   # no values yet
 
 database:
+  # no values yet
+
+ui:
   # no values yet
 
 access:

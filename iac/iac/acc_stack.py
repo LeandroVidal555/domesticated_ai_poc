@@ -6,6 +6,7 @@ from aws_cdk import(
     aws_ec2 as ec2,
     aws_elasticloadbalancingv2 as elbv2,
     aws_elasticloadbalancingv2_targets as elbv2_targets,
+    aws_s3 as s3,
     aws_ssm as ssm,
     aws_secretsmanager as secretsmanager
 )
@@ -23,9 +24,9 @@ class AccessStack(cdk.Stack):
 
         sg_alb_ws = ec2.SecurityGroup.from_lookup_by_name(self, "SG_ALB_WS", security_group_name=f"{cg['common_prefix']}-{cg['env']}-alb-ws-sg", vpc=vpc)
 
-        ec2_instance_id = ssm.StringParameter.from_string_parameter_name(
+        ec2_be_instance_id = ssm.StringParameter.from_string_parameter_name(
             self, "SSMParam_EC2_ID",
-            string_parameter_name=f"/{cg['common_prefix']}-{cg['env']}/pipeline/ec2_instance_id"
+            string_parameter_name=f"/{cg['common_prefix']}-{cg['env']}/pipeline/ec2_be_instance_id"
         ).string_value
 
         #pgres_ip = ssm.StringParameter.from_string_parameter_name(
@@ -95,21 +96,21 @@ class AccessStack(cdk.Stack):
 
         # Create the ALB
         alb_ws = elbv2.ApplicationLoadBalancer(
-            self, "ALB_WebServer",
-            load_balancer_name=f"{cg['common_prefix']}-{cg['env']}-webserver-alb",
+            self, "ALB_GoBackend",
+            load_balancer_name=f"{cg['common_prefix']}-{cg['env']}-be-alb",
             vpc=vpc,
             internet_facing=True,
             security_group=sg_alb_ws
         )
         
         tg_alb_ws = elbv2_targets.InstanceIdTarget(
-            instance_id=ec2_instance_id,
+            instance_id=ec2_be_instance_id,
             port=8080
         )
 
         # Add a listener for HTTP
         listener = alb_ws.add_listener(
-            "Listener_ALB_WebServer",
+            "Listener_ALB_GoBackend",
             port=8080,
             open=True,
             default_action=elbv2.ListenerAction.fixed_response(
@@ -121,7 +122,7 @@ class AccessStack(cdk.Stack):
 
         # Add the default action to forward to the target group
         listener.add_targets(
-            "TG_ALB_WebServer",
+            "TG_ALB_GoBackend",
             target_group_name=f"{cg['common_prefix']}-{cg['env']}-alb-ws-tg",
             port=8080,
             targets=[tg_alb_ws],
@@ -146,10 +147,10 @@ class AccessStack(cdk.Stack):
         
         
         #####################################################
-        ##### CLOUDFRONT - EC2 Webservice ###################
+        ##### CLOUDFRONT - EC2 Go Backend ###################
         #####################################################
     
-        # CloudFront origin pointing to the EC2 instance
+        # CloudFront origin pointing to the EC2 Backend instance
         origin = cf_origins.HttpOrigin(
             domain_name=alb_ws.load_balancer_dns_name,
             http_port=8080,
@@ -168,4 +169,45 @@ class AccessStack(cdk.Stack):
                 response_headers_policy=cloudfront.ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS_WITH_PREFLIGHT_AND_SECURITY_HEADERS,
                 viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.HTTPS_ONLY
             )
+        )
+
+        #####################################################
+        ##### CLOUDFRONT - S3 WEBSITE #######################
+        #####################################################
+
+        s3_website_bucket = s3.Bucket.from_bucket_name(self, "SiteBucket", bucket_name=f"{cg['common_prefix']}-{cg['env']}-ui")
+
+        ### Define the custom origin
+        cf_origin_default = cf_origins.HttpOrigin(
+            domain_name = s3_website_bucket.bucket_domain_name.replace("s3.","s3-website-"),
+            origin_id = f"{cg['common_prefix']}-{cg['env']}-ui",
+            http_port = 80,
+            protocol_policy = cloudfront.OriginProtocolPolicy.HTTP_ONLY
+        )
+
+        ### Define error responses as we use client-side routing
+        error_responses = [
+            cloudfront.ErrorResponse(
+            http_status = 404,
+            response_page_path = '/index.html',
+            response_http_status = 200
+            ),
+            cloudfront.ErrorResponse(
+                http_status = 403,
+                response_page_path = '/index.html',
+                response_http_status = 200
+            )
+        ]
+        
+        ### Create CloudFront Distribution
+        cf = cloudfront.Distribution(self, "MyDistributionS3Website",
+            default_behavior = cloudfront.BehaviorOptions(
+                allowed_methods = cloudfront.AllowedMethods.ALLOW_ALL,
+                cache_policy = cloudfront.CachePolicy.CACHING_OPTIMIZED,
+                origin_request_policy = cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+                origin = cf_origin_default,
+                viewer_protocol_policy = cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
+            ),
+            price_class = cloudfront.PriceClass.PRICE_CLASS_100,
+            error_responses = error_responses
         )

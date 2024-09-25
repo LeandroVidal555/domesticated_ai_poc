@@ -77,10 +77,10 @@ class ComputeStack(cdk.Stack):
         
         keypair_ec2 = ec2.KeyPair.from_key_pair_name(self, "KeyPair_EC2_Import", f"{cg['common_prefix']}-{cg['env']}-ec2-keypair")
 
-        # Define the EC2 instance
-        ec2_instance = ec2.Instance(
+        # Define the EC2 Backend instance
+        ec2_be_instance = ec2.Instance(
             self, "EC2_Instance",
-            instance_name=f"{cg['common_prefix']}-{cg['env']}-ec2",
+            instance_name=f"{cg['common_prefix']}-{cg['env']}-be",
             instance_type=ec2.InstanceType("t2.micro"),
             machine_image=ec2.MachineImage.latest_amazon_linux2023(),
             block_devices=[volume],
@@ -93,6 +93,6 @@ class ComputeStack(cdk.Stack):
 
         ssm.StringParameter(
             self, "SSMParam_EC2_ID",
-            parameter_name=f"/{cg['common_prefix']}-{cg['env']}/pipeline/ec2_instance_id",
-            string_value=ec2_instance.instance_id
+            parameter_name=f"/{cg['common_prefix']}-{cg['env']}/pipeline/ec2_be_instance_id",
+            string_value=ec2_be_instance.instance_id
         )

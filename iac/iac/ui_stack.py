@@ -25,10 +25,9 @@ class UIStack(cdk.Stack):
         #####################################################
         ##### S3 STATIC WEBSITE #############################
         #####################################################
-
         
         site_bucket = s3.Bucket(self, "SiteBucket",
-            bucket_name = f"{cg['common_prefix']}-{cg['env']}-intake-website",
+            bucket_name = f"{cg['common_prefix']}-{cg['env']}-ui",
             website_index_document = "index.html",
             website_error_document = "error.html",
             public_read_access = True,
