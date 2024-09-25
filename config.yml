@@ -24,7 +24,8 @@ security:
   cf_prefix_list: 'pl-4ea04527'
 
 compute:
-  # no values yet
+  ec2_be_machine_type: 't2.micro'
+  ebs_device_name: '/dev/xvda'
 
 database:
   # no values yet
@@ -34,3 +35,5 @@ ui:
 
 access:
   pgres_port: 5432
+  cache_policy_be: 'disabled'
+  cache_policy_ui: 'enabled'

@@ -67,7 +67,7 @@ class ComputeStack(cdk.Stack):
         #####################################################
 
         volume = ec2.BlockDevice(
-            device_name="/dev/xvda",
+            device_name=cs["ebs_device_name"],
             volume=ec2.BlockDeviceVolume.ebs(
                 volume_size=27,
                 volume_type=ec2.EbsDeviceVolumeType.GP3,
@@ -81,7 +81,7 @@ class ComputeStack(cdk.Stack):
         ec2_be_instance = ec2.Instance(
             self, "EC2_Instance",
             instance_name=f"{cg['common_prefix']}-{cg['env']}-be",
-            instance_type=ec2.InstanceType("t2.micro"),
+            instance_type=ec2.InstanceType(cs["ec2_be_machine_type"]),
             machine_image=ec2.MachineImage.latest_amazon_linux2023(),
             block_devices=[volume],
             vpc=vpc,
@@ -93,6 +93,6 @@ class ComputeStack(cdk.Stack):
 
         ssm.StringParameter(
             self, "SSMParam_EC2_ID",
-            parameter_name=f"/{cg['common_prefix']}-{cg['env']}/pipeline/ec2_be_instance_id",
+            parameter_name=f"/{cg['common_prefix']}-{cg['env']}/iac/ec2_be_instance_id",
             string_value=ec2_be_instance.instance_id
         )

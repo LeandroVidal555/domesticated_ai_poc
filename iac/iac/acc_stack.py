@@ -26,12 +26,12 @@ class AccessStack(cdk.Stack):
 
         ec2_be_instance_id = ssm.StringParameter.from_string_parameter_name(
             self, "SSMParam_EC2_ID",
-            string_parameter_name=f"/{cg['common_prefix']}-{cg['env']}/pipeline/ec2_be_instance_id"
+            string_parameter_name=f"/{cg['common_prefix']}-{cg['env']}/iac/ec2_be_instance_id"
         ).string_value
 
         #pgres_ip = ssm.StringParameter.from_string_parameter_name(
         #    self, "SSMParam_PGRES_IP",
-        #    string_parameter_name=f"/{cg['common_prefix']}-{cg['env']}/pipeline/pgres_ip"
+        #    string_parameter_name=f"/{cg['common_prefix']}-{cg['env']}/iac/pgres_ip"
         #).string_value
 
         #####################################################
@@ -158,13 +158,14 @@ class AccessStack(cdk.Stack):
             custom_headers={"x-cloudfront-secret-key": secret_cf_key}
         )
 
+        cache_policy = cloudfront.CachePolicy.CACHING_DISABLED if cs["cache_policy_be"] == "disabled" else cloudfront.CachePolicy.CACHING_OPTIMIZED
         # CloudFront distribution
         cloudfront.Distribution(
             self, "CF_WS_Distribution",
             default_behavior=cloudfront.BehaviorOptions(
                 origin=origin,
                 allowed_methods=cloudfront.AllowedMethods.ALLOW_ALL,
-                cache_policy=cloudfront.CachePolicy.CACHING_DISABLED,
+                cache_policy=cache_policy,
                 origin_request_policy=cloudfront.OriginRequestPolicy.ALL_VIEWER,
                 response_headers_policy=cloudfront.ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS_WITH_PREFLIGHT_AND_SECURITY_HEADERS,
                 viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.HTTPS_ONLY
@@ -199,11 +200,12 @@ class AccessStack(cdk.Stack):
             )
         ]
         
+        cache_policy = cloudfront.CachePolicy.CACHING_DISABLED if cs["cache_policy_ui"] == "disabled" else cloudfront.CachePolicy.CACHING_OPTIMIZED
         ### Create CloudFront Distribution
         cf = cloudfront.Distribution(self, "MyDistributionS3Website",
             default_behavior = cloudfront.BehaviorOptions(
                 allowed_methods = cloudfront.AllowedMethods.ALLOW_ALL,
-                cache_policy = cloudfront.CachePolicy.CACHING_OPTIMIZED,
+                cache_policy = cache_policy,
                 origin_request_policy = cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
                 origin = cf_origin_default,
                 viewer_protocol_policy = cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
