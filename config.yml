@@ -1,5 +1,5 @@
 global:
-  account: '026090519011'
+  account: '649999766497'
   region: 'us-east-1'
   common_prefix: 'dom-ai'
   env: 'poc'
@@ -11,7 +11,7 @@ global:
 
 networking:
   vpc_cidr: '172.32.0.0/16'
-  az_count: 3
+  az_count: 2
   public_subnet_name: 'PublicSubnet'
   public_subnet_prefix: 20
   private_subnet_name: 'PrivateSubnet'
@@ -21,14 +21,14 @@ networking:
 
 security:
   pgres_port: 5432
-  cf_prefix_list: 'pl-4ea04527'
+  cf_prefix_list: 'pl-3b927c52'
 
 compute:
   ec2_be_machine_type: 't2.micro'
   ebs_device_name: '/dev/xvda'
 
 database:
-  # no values yet
+  database_name: 'epwery'
 
 ui:
   # no values yet

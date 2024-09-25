@@ -49,13 +49,14 @@
             ]
         },
         {
-        "Effect": "Allow",
-        "Action": [
-             "rds-db:connect"
-         ],
-         "Resource": [
-             "arn:aws:rds-db:${REGION}:${AWS_ACCOUNT_ID}:dbuser:${PGRES_ID}/corbo"
-         ]
-      }
+            "Description": "PGres DB connection",
+            "Effect": "Allow",
+            "Action": [
+                "rds-db:connect"
+            ],
+            "Resource": [
+                "arn:aws:rds-db:${REGION}:${AWS_ACCOUNT_ID}:dbuser:${PGRES_ID}/epwery"
+            ]
+        }
     ]
 }

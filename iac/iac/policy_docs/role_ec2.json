@@ -2,11 +2,60 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Description": "DUmmy for synth",
+            "Description": "Secrets Manager",
             "Effect": "Allow",
-            "Action": "test:1",
+            "Action": "secretsmanager:GetSecretValue",
             "Resource": [
-                "dummy"
+                "arn:aws:secretsmanager:us-east-1:649999766497:secret:dom-ai-poc-pgres-creds-*"
+            ]
+        },
+        {
+            "Description": "RDS Postgres allow",
+            "Effect": "Allow",
+            "Action": [
+                "rds:*"
+            ],
+            "Resource": [
+                "arn:aws:rds:us-east-1:649999766497:db:dom-ai-poc-pgres"
+            ]
+        },
+        {
+            "Description": "RDS Postgres deny",
+            "Effect": "Deny",
+            "Action": [
+                "rds:DeleteDBInstance",
+                "rds:DeleteDBCluster",
+                "rds:DeleteDBSnapshot",
+                "rds:DeleteDBClusterSnapshot",
+                "rds:ModifyDBInstance",
+                "rds:ModifyDBCluster",
+                "rds:ModifyDBSubnetGroup",
+                "rds:ModifyDBParameterGroup",
+                "rds:StopDBInstance",
+                "rds:StartDBInstance",
+                "rds:RebootDBInstance",
+                "rds:CreateDBSnapshot",
+                "rds:CreateDBClusterSnapshot",
+                "rds:RestoreDBInstanceFromDBSnapshot",
+                "rds:RestoreDBClusterFromSnapshot",
+                "rds:DownloadDBLogFilePortion",
+                "rds:DescribeDBLogFiles",
+                "rds:CreateDBInstance",
+                "rds:CreateDBCluster",
+                "rds:CreateDBInstanceReadReplica"
+            ],
+            "Resource": [
+                "arn:aws:rds:us-east-1:649999766497:db:dom-ai-poc-pgres"
+            ]
+        },
+        {
+            "Description": "PGres DB connection",
+            "Effect": "Allow",
+            "Action": [
+                "rds-db:connect"
+            ],
+            "Resource": [
+                "arn:aws:rds-db:us-east-1:649999766497:dbuser:${PGRES_ID}/epwery"
             ]
         }
     ]

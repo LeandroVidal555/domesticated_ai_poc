@@ -43,7 +43,7 @@ class DatabaseStack(cdk.Stack):
         rds.DatabaseInstance(
             self, "RDS_Pgres",
             instance_identifier = f"{cg['common_prefix']}-{cg['env']}-pgres",
-            database_name = "corbo",
+            database_name = cs["database_name"],
             engine = rds.DatabaseInstanceEngine.postgres(
                 version = rds.PostgresEngineVersion.VER_16_3),
             instance_type = ec2.InstanceType.of(
@@ -62,8 +62,8 @@ class DatabaseStack(cdk.Stack):
 # NOTE 1: you need to run the following to enable pgvector:
 # CREATE EXTENSION vector;
 # NOTE 2: you need to run the following to create the IAM authenticated dbuser:
-# CREATE USER corbo;
-# GRANT rds_iam TO corbo;
+# CREATE USER epwery;
+# GRANT rds_iam TO epwery;
 
 
 # TODO: come up with an automated method.

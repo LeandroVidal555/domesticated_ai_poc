@@ -10,7 +10,7 @@ import json
 def attach_policy_doc(scope, file, role):
     """Add a policy to a role, providing a json file name"""
 
-    with open(f"iac_backend/policy_docs/{file}.json", 'r') as policy_file:
+    with open(f"iac/policy_docs/{file}.json", 'r') as policy_file:
         data = policy_file.read()
         policy_dict = json.loads(data)
 

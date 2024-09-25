@@ -22,8 +22,8 @@ env           = config['global']['env']
 app = cdk.App()
 NetworkingStack(app, f"{common_prefix}-{env}-networking-stack", config=config, env=cdk.Environment(account=account, region=region))
 SecurityStack  (app, f"{common_prefix}-{env}-security-stack",   config=config, env=cdk.Environment(account=account, region=region))
-ComputeStack   (app, f"{common_prefix}-{env}-compute-stack",    config=config, env=cdk.Environment(account=account, region=region))
 DatabaseStack  (app, f"{common_prefix}-{env}-database-stack",   config=config, env=cdk.Environment(account=account, region=region))
+ComputeStack   (app, f"{common_prefix}-{env}-compute-stack",    config=config, env=cdk.Environment(account=account, region=region))
 UIStack        (app, f"{common_prefix}-{env}-ui-stack",         config=config, env=cdk.Environment(account=account, region=region))
 AccessStack    (app, f"{common_prefix}-{env}-access-stack",     config=config, env=cdk.Environment(account=account, region=region))
 

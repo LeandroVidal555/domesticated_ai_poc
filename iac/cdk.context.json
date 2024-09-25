@@ -1,0 +1,84 @@
+{
+  "availability-zones:account=649999766497:region=us-east-1": [
+    "us-east-1a",
+    "us-east-1b",
+    "us-east-1c",
+    "us-east-1d",
+    "us-east-1e",
+    "us-east-1f"
+  ],
+  "vpc-provider:account=649999766497:filter.tag:Name=dom-ai-poc-vpc:region=us-east-1:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-03728489c19b27eb0",
+    "vpcCidrBlock": "172.32.0.0/16",
+    "ownerAccountId": "649999766497",
+    "availabilityZones": [],
+    "subnetGroups": [
+      {
+        "name": "dom-ai-poc-PrivateSubnet",
+        "type": "Private",
+        "subnets": [
+          {
+            "subnetId": "subnet-083b02cee8b430064",
+            "cidr": "172.32.32.0/20",
+            "availabilityZone": "us-east-1a",
+            "routeTableId": "rtb-09c3bfe5e5ec02f88"
+          },
+          {
+            "subnetId": "subnet-032a912a421079c28",
+            "cidr": "172.32.48.0/20",
+            "availabilityZone": "us-east-1b",
+            "routeTableId": "rtb-0463552905dfba3c3"
+          }
+        ]
+      },
+      {
+        "name": "dom-ai-poc-IsolatedSubnet",
+        "type": "Isolated",
+        "subnets": [
+          {
+            "subnetId": "subnet-0c5957714a62a20bc",
+            "cidr": "172.32.64.0/20",
+            "availabilityZone": "us-east-1a",
+            "routeTableId": "rtb-07b90f2fc885f8826"
+          },
+          {
+            "subnetId": "subnet-07e29e5b6b98c5ec4",
+            "cidr": "172.32.80.0/20",
+            "availabilityZone": "us-east-1b",
+            "routeTableId": "rtb-0da5eb75ee2217be2"
+          }
+        ]
+      },
+      {
+        "name": "dom-ai-poc-PublicSubnet",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-086e37f1c9e9838c7",
+            "cidr": "172.32.0.0/20",
+            "availabilityZone": "us-east-1a",
+            "routeTableId": "rtb-03709a54121e30c4d"
+          },
+          {
+            "subnetId": "subnet-058e24e5a1e85af96",
+            "cidr": "172.32.16.0/20",
+            "availabilityZone": "us-east-1b",
+            "routeTableId": "rtb-0a04f78c54f1ecd4d"
+          }
+        ]
+      }
+    ]
+  },
+  "security-group:account=649999766497:region=us-east-1:securityGroupName=dom-ai-poc-pgres-sg:vpcId=vpc-03728489c19b27eb0": {
+    "securityGroupId": "sg-0abead73f9683d146",
+    "allowAllOutbound": false
+  },
+  "security-group:account=649999766497:region=us-east-1:securityGroupName=dom-ai-poc-ec2-sg:vpcId=vpc-03728489c19b27eb0": {
+    "securityGroupId": "sg-0e53f839adb8128ec",
+    "allowAllOutbound": false
+  },
+  "security-group:account=649999766497:region=us-east-1:securityGroupName=dom-ai-poc-alb-ws-sg:vpcId=vpc-03728489c19b27eb0": {
+    "securityGroupId": "sg-0a806d5558daa6765",
+    "allowAllOutbound": false
+  }
+}
