@@ -88,7 +88,8 @@ class ComputeStack(cdk.Stack):
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS),
             security_group=sg_ec2,
             key_pair=keypair_ec2,
-            role=role_ec2
+            role=role_ec2,
+            user_data_causes_replacement=True
         )
 
         # Read user data script and load it to the EC2 Backend instance's config
