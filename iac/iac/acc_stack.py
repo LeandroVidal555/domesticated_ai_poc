@@ -172,7 +172,7 @@ class AccessStack(cdk.Stack):
         error_responses = [
             cloudfront.ErrorResponse(
                 http_status = 404,
-                response_page_path = '/error.html',
+                response_page_path = '/index.html',
                 response_http_status = 200
             ),
             cloudfront.ErrorResponse(
