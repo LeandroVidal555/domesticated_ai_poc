@@ -88,9 +88,16 @@ class ComputeStack(cdk.Stack):
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS),
             security_group=sg_ec2,
             key_pair=keypair_ec2,
-            role=role_ec2,
+            role=role_ec2
         )
 
+        # Read user data script and load it to the EC2 Backend instance's config
+        with open("iac/ec2_user_data/ec2_user_data.sh", 'r') as file:
+            user_data = file.read()
+
+        ec2_be_instance.add_user_data(user_data)
+
+        # Load EC2 Backend instance's ID to SSM Param Store to be used as ALB target later
         ssm.StringParameter(
             self, "SSMParam_EC2_ID",
             parameter_name=f"/{cg['common_prefix']}-{cg['env']}/iac/ec2_be_instance_id",

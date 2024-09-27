@@ -137,7 +137,7 @@ class AccessStack(cdk.Stack):
             ],
             priority=1,
             health_check=elbv2.HealthCheck(
-                path="/",
+                path="/api/health_check.html",
                 port="8080",
                 protocol=elbv2.Protocol.HTTP,
                 healthy_threshold_count=2,
