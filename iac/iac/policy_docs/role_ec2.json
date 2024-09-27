@@ -55,7 +55,7 @@
                 "rds-db:connect"
             ],
             "Resource": [
-                "arn:aws:rds-db:us-east-1:649999766497:dbuser:${PGRES_ID}/epwery"
+                "arn:aws:rds-db:us-east-1:649999766497:dbuser:db-LZZEQHIG6JZGFGG33ZXM3UWXUM/epwery"
             ]
         }
     ]

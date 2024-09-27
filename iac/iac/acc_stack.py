@@ -144,72 +144,65 @@ class AccessStack(cdk.Stack):
                 interval=cdk.Duration.seconds(15)
             )
         )
-        
-        
-        #####################################################
-        ##### CLOUDFRONT - EC2 Go Backend ###################
-        #####################################################
-    
-        # CloudFront origin pointing to the EC2 Backend instance
-        origin = cf_origins.HttpOrigin(
-            domain_name=alb_ws.load_balancer_dns_name,
-            http_port=8080,
-            protocol_policy=cloudfront.OriginProtocolPolicy.HTTP_ONLY,
-            custom_headers={"x-cloudfront-secret-key": secret_cf_key}
-        )
 
-        cache_policy = cloudfront.CachePolicy.CACHING_DISABLED if cs["cache_policy_be"] == "disabled" else cloudfront.CachePolicy.CACHING_OPTIMIZED
-        # CloudFront distribution
-        cloudfront.Distribution(
-            self, "CF_WS_Distribution",
-            default_behavior=cloudfront.BehaviorOptions(
-                origin=origin,
-                allowed_methods=cloudfront.AllowedMethods.ALLOW_ALL,
-                cache_policy=cache_policy,
-                origin_request_policy=cloudfront.OriginRequestPolicy.ALL_VIEWER,
-                response_headers_policy=cloudfront.ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS_WITH_PREFLIGHT_AND_SECURITY_HEADERS,
-                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.HTTPS_ONLY
-            )
-        )
-
+        
         #####################################################
-        ##### CLOUDFRONT - S3 WEBSITE #######################
+        ##### CLOUDFRONT - EC2 Go Backend & S3 WebSite ######
         #####################################################
 
         s3_website_bucket = s3.Bucket.from_bucket_name(self, "SiteBucket", bucket_name=f"{cg['common_prefix']}-{cg['env']}-ui")
 
         ### Define the custom origin
-        cf_origin_default = cf_origins.HttpOrigin(
+        s3_origin = cf_origins.HttpOrigin(
             domain_name = s3_website_bucket.bucket_domain_name.replace("s3.","s3-website-"),
             origin_id = f"{cg['common_prefix']}-{cg['env']}-ui",
-            http_port = 80,
             protocol_policy = cloudfront.OriginProtocolPolicy.HTTP_ONLY
+        )
+    
+        # CloudFront origin pointing to the EC2 Backend instance
+        be_origin = cf_origins.HttpOrigin(
+            domain_name=alb_ws.load_balancer_dns_name,
+            origin_id = f"{cg['common_prefix']}-{cg['env']}-be",
+            http_port=8080,
+            protocol_policy=cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+            custom_headers={"x-cloudfront-secret-key": secret_cf_key}
         )
 
         ### Define error responses as we use client-side routing
         error_responses = [
             cloudfront.ErrorResponse(
-            http_status = 404,
-            response_page_path = '/index.html',
-            response_http_status = 200
+                http_status = 404,
+                response_page_path = '/error.html',
+                response_http_status = 200
             ),
             cloudfront.ErrorResponse(
                 http_status = 403,
-                response_page_path = '/index.html',
+                response_page_path = '/error.html',
                 response_http_status = 200
             )
         ]
         
-        cache_policy = cloudfront.CachePolicy.CACHING_DISABLED if cs["cache_policy_ui"] == "disabled" else cloudfront.CachePolicy.CACHING_OPTIMIZED
+        ui_cache_policy = cloudfront.CachePolicy.CACHING_DISABLED if cs["cache_policy_ui"] == "disabled" else cloudfront.CachePolicy.CACHING_OPTIMIZED
+        be_cache_policy = cloudfront.CachePolicy.CACHING_DISABLED if cs["cache_policy_be"] == "disabled" else cloudfront.CachePolicy.CACHING_OPTIMIZED
         ### Create CloudFront Distribution
         cf = cloudfront.Distribution(self, "MyDistributionS3Website",
             default_behavior = cloudfront.BehaviorOptions(
-                allowed_methods = cloudfront.AllowedMethods.ALLOW_ALL,
-                cache_policy = cache_policy,
+                allowed_methods = cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+                cache_policy = ui_cache_policy,
                 origin_request_policy = cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
-                origin = cf_origin_default,
+                origin = s3_origin,
                 viewer_protocol_policy = cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
             ),
+            additional_behaviors={
+                "/api/*": cloudfront.BehaviorOptions(
+                    origin=be_origin,
+                    allowed_methods=cloudfront.AllowedMethods.ALLOW_ALL,
+                    cache_policy=be_cache_policy,
+                    origin_request_policy=cloudfront.OriginRequestPolicy.ALL_VIEWER,
+                    response_headers_policy=cloudfront.ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS_WITH_PREFLIGHT_AND_SECURITY_HEADERS,
+                    viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.HTTPS_ONLY
+                )
+            },
             price_class = cloudfront.PriceClass.PRICE_CLASS_100,
             error_responses = error_responses
         )
